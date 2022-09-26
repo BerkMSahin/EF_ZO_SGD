@@ -12,6 +12,7 @@ class Agent:
         self.velocity = 0
         self.local_grad = np.zeros((simulation.n, simulation.dim))
         self.error = np.zeros((simulation.n, simulation.dim))
+        self.cooldown = 0
 
     # Loss functions for gradient estimation, with respect to the pursued source
     def loss(self, source):

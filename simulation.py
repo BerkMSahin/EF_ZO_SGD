@@ -15,7 +15,7 @@ class Simulation:
                  anim_width=1600, anim_height=900, compression=False,
                  num_bits=3, quantization_function="top", dropout_p=0.5,
                  fraction_coordinates=0.5, error_factor=False, plot=False,
-                 n_dropout=True, n_dropout_p=0.5):
+                 n_dropout=True, n_dropout_p=0.5, cooldown=3):
         self.eta = eta
         self.alpha = alpha
         self.beta = beta
@@ -50,6 +50,7 @@ class Simulation:
         self.n_dropout = n_dropout
         self.n_dropout_p = n_dropout_p
         self.directory = directory
+        self.cooldown = cooldown
 
     @staticmethod
     def tracking_error(agent, source):
@@ -84,18 +85,15 @@ class Simulation:
             agent = self.agents[agent_idx]
             for neighbor in self.neighbors_aggregate[agent_idx]:
                 # To make the dimensions consistent
-                if len(agent.position.shape) == 2:
-                    agent.position = np.squeeze(agent.position, axis=0)
-                if len(neighbor.position.shape) == 2:
-                    neighbor.position = np.squeeze(neighbor.position, axis=0)
+                agent.position = agent.position.reshape(2, 1)
+                neighbor.position = neighbor.position.reshape(2, 1)
 
                 if abs(agent.position[0] - neighbor.position[0]) < 0.05 and abs(
-                        agent.position[1] - neighbor.position[1]) < 0.05:
-                    # print(f"COLLISION HAPPENED BETWEEN AGENT {agent_idx} - {neighbor.index}!")
-                    # print("Difference between x coordinates: ", abs(agent.position[0] - neighbor.position[0]))
-                    # print("Difference between y coordinates: ", abs(agent.position[1] - neighbor.position[1]))
-                    # print("*" * 10)
-                    self.collision_counter += 0.5  # because we are counting the same collision twice
+                        agent.position[1] - neighbor.position[1]) < 0.05 and agent.cooldown == 0\
+                        and neighbor.cooldown == 0:
+                    self.collision_counter += 1
+                    agent.cooldown = self.cooldown
+                    neighbor.cooldown = self.cooldown
 
     def run(self):
         for i in range(self.iterations):
@@ -117,6 +115,9 @@ class Simulation:
                 for k in range(self.n):
                     agent = self.agents[k]
                     source = self.sources[k]
+
+                    if agent.cooldown != 0:
+                        agent.cooldown -= 1
 
                     agent.compute_grad(source)
 
