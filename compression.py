@@ -57,7 +57,7 @@ class Compression:
             q = np.zeros_like(x)
             bits = self.num_bits
             s = 2 ** bits
-            tau = 1 + min((np.sqrt(q.shape[0])/s), (q.shape[0]/(s**2)))
+            tau = 1 + min((np.sqrt(q.shape[0]) / s), (q.shape[0] / (s ** 2)))
 
             for i in range(0, q.shape[1]):
                 unif_i = np.random.rand(q.shape[0], )
@@ -65,8 +65,8 @@ class Compression:
                 if np.linalg.norm(x_i) == 0:
                     continue
 
-                q[:, i] = ((np.sign(x_i) * np.linalg.norm(x_i))/(s*tau)) * \
-                          np.floor((s*np.abs(x_i)/np.linalg.norm(x_i)) + unif_i)
+                q[:, i] = ((np.sign(x_i) * np.linalg.norm(x_i)) / (s * tau)) * \
+                          np.floor((s * np.abs(x_i) / np.linalg.norm(x_i)) + unif_i)
             return q
         else:
             raise NotImplementedError

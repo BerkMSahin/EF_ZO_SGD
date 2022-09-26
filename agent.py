@@ -37,7 +37,7 @@ class Agent:
         local_grad = np.zeros((self.simulation.n, self.simulation.dim))
         grad_i = u * (self.loss_plus(source, u) - self.loss(source)) / self.simulation.eta
         local_grad[self.index, :] = grad_i
-        for neighbor in self.simulation.neighbors_aggregate[self.index]:
+        for neighbor in self.simulation.detected_neighbors[self.index]:
             u = np.random.standard_normal((1, self.simulation.dim))
             grad_j = u * (self.loss_reg_plus(neighbor, u) - self.loss_reg(neighbor)) / self.simulation.eta
             local_grad[neighbor.index, :] = -grad_j

@@ -9,12 +9,13 @@ import matplotlib.pyplot as plt
 
 
 class Simulation:
-    def __init__(self, eta=.35, alpha=.03, beta=.025, dim=2,
+    def __init__(self, directory, eta=.35, alpha=.03, beta=.025, dim=2,
                  steps=10000, iterations=10, n=5, r=5,
-                 Lambda=.1, init_size=100, K=1, animate=False,
+                 Lambda=.1, init_size=100, k=1, animate=False,
                  anim_width=1600, anim_height=900, compression=False,
                  num_bits=3, quantization_function="top", dropout_p=0.5,
-                 fraction_coordinates=0.5, error_factor=False, plot=False):
+                 fraction_coordinates=0.5, error_factor=False, plot=False,
+                 n_dropout=True, n_dropout_p=0.5):
         self.eta = eta
         self.alpha = alpha
         self.beta = beta
@@ -25,7 +26,7 @@ class Simulation:
         self.r = r
         self.Lambda = Lambda
         self.init_size = init_size
-        self.K = K
+        self.k = k
         self.animate = animate
         self.anim_width = anim_width
         self.anim_height = anim_height
@@ -36,31 +37,47 @@ class Simulation:
         self.sources = []
         self.source_locs = np.zeros((n, steps, dim))
         self.neighbors_aggregate = {}
+        self.detected_neighbors = {}
         # Compression parameters
         self.compression = compression
         self.quantization_function = quantization_function
-        self.compressor = Compression(num_bits, quantization_function, dropout_p, fraction_coordinates) if compression else None
+        self.compressor = Compression(num_bits, quantization_function, dropout_p,
+                                      fraction_coordinates) if compression else None
         self.error_factor = error_factor
-        self.collision_counter = 0 # counts the collisions between agents
+        self.collision_counter = 0  # counts the collisions between agents
         self.plot = plot
         self.collision_hist = np.zeros((self.iterations, 1))
+        self.n_dropout = n_dropout
+        self.n_dropout_p = n_dropout_p
+        self.directory = directory
 
     @staticmethod
     def tracking_error(agent, source):
         return norm(agent.position - source.position) ** 2
 
     # Calculates and updates each agent's list of neighboring agents
-    def calculate_neighbors(self, noise):
+    def calculate_neighbors(self):
+        x1 = 1
+        x2 = 1
         self.neighbors_aggregate.clear()
-        for i in range(self.n):
-            self.neighbors_aggregate[i] = []
+        self.detected_neighbors.clear()
 
         for i in range(self.n):
-            for j in range(self.n):
+            self.neighbors_aggregate[i] = []
+            self.detected_neighbors[i] = []
+
+        for i in range(self.n):
+            for j in range(i + 1, self.n):
                 if norm(self.agents[i].position - self.agents[j].position) < self.r:
-                    die = np.random.uniform(0, 1)
-                    if die > noise:
-                        self.neighbors_aggregate[i].append(self.agents[j])
+                    self.neighbors_aggregate[i].append(self.agents[j])
+                    self.neighbors_aggregate[j].append(self.agents[i])
+                    if self.n_dropout:
+                        x1 = np.random.rand()
+                        x2 = np.random.rand()
+                    if x1 > self.n_dropout_p:
+                        self.detected_neighbors[i].append(self.agents[j])
+                    if x2 > self.n_dropout_p:
+                        self.detected_neighbors[j].append(self.agents[i])
 
     def count_collisions(self):
         for agent_idx in range(self.n):
@@ -72,17 +89,17 @@ class Simulation:
                 if len(neighbor.position.shape) == 2:
                     neighbor.position = np.squeeze(neighbor.position, axis=0)
 
-                if abs(agent.position[0] - neighbor.position[0]) < 0.05 and abs(agent.position[1] - neighbor.position[1]) < 0.05:
-                    #print(f"COLLISION HAPPENED BETWEEN AGENT {agent_idx} - {neighbor.index}!")
-                    #print("Difference between x coordinates: ", abs(agent.position[0] - neighbor.position[0]))
-                    #print("Difference between y coordinates: ", abs(agent.position[1] - neighbor.position[1]))
-                    #print("*" * 10)
-                    self.collision_counter += 0.5 #because we are counting the same collision twice
+                if abs(agent.position[0] - neighbor.position[0]) < 0.05 and abs(
+                        agent.position[1] - neighbor.position[1]) < 0.05:
+                    # print(f"COLLISION HAPPENED BETWEEN AGENT {agent_idx} - {neighbor.index}!")
+                    # print("Difference between x coordinates: ", abs(agent.position[0] - neighbor.position[0]))
+                    # print("Difference between y coordinates: ", abs(agent.position[1] - neighbor.position[1]))
+                    # print("*" * 10)
+                    self.collision_counter += 0.5  # because we are counting the same collision twice
 
-
-    def run(self, noise=0.5, dir="losses"):
+    def run(self):
         for i in range(self.iterations):
-            np.random.seed(i+5) # set random seed
+            np.random.seed(i + 5)  # set random seed
             self.collision_counter = 0
             server = Server(self)
             for j in range(self.n):
@@ -93,8 +110,8 @@ class Simulation:
                 self.sources.append(source)
 
             for j in range(self.steps):
-                if j % self.K == 0:
-                    self.calculate_neighbors(noise)
+                if j % self.k == 0:
+                    self.calculate_neighbors()
                 self.losses_aggregate.append([])
 
                 for k in range(self.n):
@@ -119,7 +136,7 @@ class Simulation:
 
                 server.aggregate()
 
-                if self.animate and i+1 == self.iterations:
+                if self.animate and i + 1 == self.iterations:
                     for k in range(self.n):
                         self.agent_locs[k][j] = self.agents[k].position
                         self.source_locs[k][j] = self.sources[k].position
@@ -136,24 +153,21 @@ class Simulation:
 
                 self.losses_aggregate[j] = np.array(self.losses_aggregate[j])
 
-
-
             global_loss = np.mean(np.array(self.losses_aggregate), axis=1)
             self.losses_aggregate = []
             self.global_losses.append(global_loss)
 
-
             # Save the losses
             if self.compression:
                 if self.error_factor:
-                    file_name = f"./{dir}/{self.quantization_function}e{i}"
+                    file_name = f"./{self.directory}/{self.quantization_function}e{i}"
                 else:
-                    file_name = f"./{dir}/{self.quantization_function}{i}"
+                    file_name = f"./{self.directory}/{self.quantization_function}{i}"
             else:
-                file_name = f"./{dir}/noComp{i}"
+                file_name = f"./{self.directory}/noComp{i}"
 
-            np.save(file_name, global_loss) # save the loss history
-            self.collision_hist[i] = self.collision_counter # save the collision count
+            np.save(file_name, global_loss)  # save the loss history
+            self.collision_hist[i] = self.collision_counter  # save the collision count
             print(f"Experiment {i} is completed.")
             print(f"Experiment {i} is completed.")
 
@@ -165,7 +179,7 @@ class Simulation:
             gui = GUI(self.anim_width, self.anim_height, self)
             gui.animate(self.agent_locs, self.source_locs)
 
-            np.save(f"./{dir}/loss_hist.npy", final_loss)
+            np.save(f"./{self.directory}/loss_hist.npy", final_loss)
 
         if self.plot:
             plt.xlabel('Steps')

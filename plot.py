@@ -1,8 +1,7 @@
+import argparse
 
-
-import numpy as np
-import os, sys, argparse
 import matplotlib.pyplot as plt
+import numpy as np
 
 parser = argparse.ArgumentParser()
 
