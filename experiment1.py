@@ -15,10 +15,10 @@ parser.add_argument("--iterations", help="Number of experiments for each case", 
 parser.add_argument("--N", help="Number of agents", type=int)
 parser.add_argument("--R", help="Radius of agent's neighbor", type=int)
 parser.add_argument("--Lambda", help="Regularization term", type=float)
-parser.add_argument("--init_size", help="Board size", type=int)
+parser.add_argument("--init_size", help="Initialization size", type=int)
 parser.add_argument("--fraction_cord", help="Fraction for top-k compression", type=float)
 parser.add_argument("--dropout_p", help="Dropout probability p", type=float)
-parser.add_argument("--noise", help="Dropout probability for neighbors (between 0-1)", type=float)
+parser.add_argument("--noise", help="Dropout probability for neighbors", type=float)
 
 args = parser.parse_args()
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     compression = False
     error_factor = False
 
-    collision_table = pd.DataFrame(data=np.zeros((ITERATIONS, 11)), columns=["Normal", c[0], c[1], c[2], c[3], c[4],
+    collision_table = pd.DataFrame(data=np.zeros((ITERATIONS, 11)), columns=["No comp.", c[0], c[1], c[2], c[3], c[4],
                                                                              f"{c[0]}e", f"{c[1]}e", f"{c[2]}e",
                                                                              f"{c[3]}e", f"{c[4]}e"])
 
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
             collision_hist = s1.run()
             print("Simulation without compression has been completed.")
-            collision_table["Normal"] = collision_hist
+            collision_table["No comp."] = collision_hist
         else:
             error = (i == 2)
             # TOP-K
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                             iterations=ITERATIONS, n=N, r=R, Lambda=LAMBDA,
                             init_size=INIT_SIZE, animate=ANIMATE, compression=True,
                             quantization_function=c[4], num_bits=4,
-                            error_factor=error, n_dropout_p=N_DROPOUT_P)
+                            error_factor=error)
 
             if error:
                 tmp = "e"
@@ -102,23 +102,23 @@ if __name__ == "__main__":
             # Run the simulations
             collision_hist = s1.run()
             collision_table[c[0] + tmp] = collision_hist
-            print("Simulation with TOP-K Compression was completed.")
+            print("Simulation with TOP-K compression has been completed.")
             print("*" * 40)
             collision_hist = s2.run()
             collision_table[c[1] + tmp] = collision_hist
-            print("Simulation with RAND Compression was completed. ")
+            print("Simulation with RAND compression has been completed. ")
             print("*" * 40)
             collision_hist = s3.run()
             collision_table[c[2] + tmp] = collision_hist
-            print("Simulation with DROPOUT-BIASED Compression was completed. ")
+            print("Simulation with DROPOUT-BIASED compression has been completed. ")
             print("*" * 40)
             collision_hist = s4.run()
             collision_table[c[3] + tmp] = collision_hist
-            print("Simulation with DROPOUT-UNBIASED Compression was completed. ")
+            print("Simulation with DROPOUT-UNBIASED compression has been completed. ")
             print("*" * 40)
             collision_hist = s5.run()
             collision_table[c[4] + tmp] = collision_hist
-            print("Simulation with QSGD Compression was completed. ")
+            print("Simulation with QSGD compression has been completed. ")
             print("*" * 40)
 
     print(collision_table)

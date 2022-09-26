@@ -15,7 +15,8 @@ class Simulation:
                  anim_width=1600, anim_height=900, compression=False,
                  num_bits=3, quantization_function="top", dropout_p=0.5,
                  fraction_coordinates=0.5, error_factor=False, plot=False,
-                 n_dropout=True, n_dropout_p=0.5, cooldown=3):
+                 n_dropout=True, n_dropout_p=0.5, cooldown=3,
+                 test_lambda=False, test_agents=False):
         self.eta = eta
         self.alpha = alpha
         self.beta = beta
@@ -51,6 +52,8 @@ class Simulation:
         self.n_dropout_p = n_dropout_p
         self.directory = directory
         self.cooldown = cooldown
+        self.test_lambda = test_lambda
+        self.test_agents = test_agents
 
     @staticmethod
     def tracking_error(agent, source):
@@ -167,10 +170,15 @@ class Simulation:
             else:
                 file_name = f"./{self.directory}/noComp{i}"
 
+            if self.test_lambda:
+                file_name += f"lamb{round(self.Lambda)}"
+
+            if self.test_agents:
+                file_name += f"N{self.n}"
+
             np.save(file_name, global_loss)  # save the loss history
             self.collision_hist[i] = self.collision_counter  # save the collision count
-            print(f"Experiment {i} is completed.")
-            print(f"Experiment {i} is completed.")
+            print(f"Experiment {i} has been completed.")
 
         final_loss = np.mean(np.array(self.global_losses), axis=0)
         print("Final loss:", final_loss[-1])

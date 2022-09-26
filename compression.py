@@ -65,8 +65,8 @@ class Compression:
                 if np.linalg.norm(x_i) == 0:
                     continue
 
-                q[:, i] = ((np.sign(x_i) * np.linalg.norm(x_i)) / (s * tau)) * \
-                          np.floor((s * np.abs(x_i) / np.linalg.norm(x_i)) + unif_i)
+                q[:, i] = ((np.sign(x_i) * np.linalg.norm(x_i))
+                           / (s * tau)) * np.floor((s * np.abs(x_i) / np.linalg.norm(x_i)) + unif_i)
             return q
         else:
             raise NotImplementedError
