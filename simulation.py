@@ -91,8 +91,8 @@ class Simulation:
                 agent.position = agent.position.reshape(2, 1)
                 neighbor.position = neighbor.position.reshape(2, 1)
 
-                if abs(agent.position[0] - neighbor.position[0]) < 0.05 and abs(
-                        agent.position[1] - neighbor.position[1]) < 0.05 and agent.cooldown == 0\
+                if np.linalg.norm(agent.position - neighbor.position) <= .5 \
+                        and agent.cooldown == 0 \
                         and neighbor.cooldown == 0:
                     self.collision_counter += 1
                     agent.cooldown = self.cooldown
