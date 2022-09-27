@@ -73,11 +73,11 @@ if __name__ == "__main__":
         print("*" * 40)
         collision_hist = s2.run()
         collision_table[cname] = collision_hist
-        print(f"Simulation with {cname} compression has been completed for lambda={listN[exp_idx]} ")
+        print(f"Simulation with {cname} compression has been completed for N={listN[exp_idx]} ")
         print("*" * 40)
         collision_hist = s3.run()
         collision_table[cname + "E"] = collision_hist
-        print(f"Simulation with {cname_e} compression + error feedback has been completed for lambda={listN[exp_idx]} ")
+        print(f"Simulation with {cname_e} compression + error feedback has been completed for N={listN[exp_idx]} ")
         print("*" * 40)
 
     print(collision_table)
