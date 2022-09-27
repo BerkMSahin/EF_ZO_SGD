@@ -177,6 +177,7 @@ class Simulation:
                 file_name += f"N{self.n}"
 
             np.save(file_name, global_loss)  # save the loss history
+            self.global_losses = []
             self.collision_hist[i] = self.collision_counter  # save the collision count
             print(f"Experiment {i} has been completed.")
 
