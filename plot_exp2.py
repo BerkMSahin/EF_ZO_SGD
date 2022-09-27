@@ -31,13 +31,12 @@ if __name__ == "__main__":
     counter = 0
     # Plot No Compression Case
     for filename in os.listdir("./losses2"):
-
         if filename == "collisions.csv":
             continue
         loss = np.load("./losses2/" + filename)
         comp_idx, lamb_idx = counter // (ITERATION * len(lambda_list)), counter % len(lambda_list)
         loss_hist[comp_idx, lamb_idx] += loss / ITERATION
-
+        counter += 1
     for i, comp_name in enumerate(compressions):
 
         plt.title(f"{comp_name} Case")

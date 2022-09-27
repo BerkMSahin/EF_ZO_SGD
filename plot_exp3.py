@@ -37,7 +37,7 @@ if __name__ == "__main__":
         loss = np.load("./losses3/" + filename)
         comp_idx, n_idx = counter // (ITERATION * len(listN)), counter % len(listN)
         loss_hist[comp_idx, n_idx] += loss / ITERATION
-
+        counter += 1
     for i, comp_name in enumerate(compressions):
 
         plt.title(f"{comp_name} Case")
