@@ -6,6 +6,7 @@ from source import Source
 from graphics import GUI
 from compression import Compression
 import matplotlib.pyplot as plt
+import os
 
 
 class Simulation:
@@ -54,6 +55,7 @@ class Simulation:
         self.cooldown = cooldown
         self.test_lambda = test_lambda
         self.test_agents = test_agents
+        self.path = ""
 
     @staticmethod
     def tracking_error(agent, source):
@@ -164,21 +166,54 @@ class Simulation:
             self.global_losses.append(global_loss)
 
             # Save the losses
-            if self.compression:
-                if self.error_factor:
-                    file_name = f"./{self.directory}/{self.quantization_function}e{i}"
+            if self.test_agents or self.test_lambda:
+                if self.compression:
+                    e = '-e' if self.error_factor else ''
+                    self.path = self.directory + '/' + self.quantization_function + e
                 else:
-                    file_name = f"./{self.directory}/{self.quantization_function}{i}"
+                    self.path = self.directory + '/' + "no-comp"
+
+                if not os.path.exists(self.path):
+                    os.makedirs(self.path)
+
+                if self.test_lambda:
+                    path = self.path + '/' + str(self.Lambda)
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    np.save(path + '/' + str(i), global_loss)
+                elif self.test_agents:
+                    path = self.path + '/' + str(self.n)
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    np.save(path + '/' + str(i), global_loss)
             else:
-                file_name = f"./{self.directory}/noComp{i}"
+                path_error = self.directory + '/error'
+                path_no_error = self.directory + '/no-error'
 
-            if self.test_lambda:
-                file_name += f"lamb{round(self.Lambda)}"
+                if not os.path.exists(path_error):
+                    os.makedirs(path_error)
 
-            if self.test_agents:
-                file_name += f"N{self.n}"
+                if not os.path.exists(path_no_error):
+                    os.makedirs(path_no_error)
 
-            np.save(file_name, global_loss)  # save the loss history
+                if self.compression:
+                    path = path_error + '/' + self.quantization_function if self.error_factor \
+                        else path_no_error + '/' + self.quantization_function
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    path += '/' + str(i)
+                    np.save(path, global_loss)
+                else:
+                    path = path_error + '/no-comp'
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    np.save(path + '/' + str(i), global_loss)
+
+                    path = path_no_error + '/no-comp'
+                    if not os.path.exists(path):
+                        os.makedirs(path)
+                    np.save(path + '/' + str(i), global_loss)
+
             self.collision_hist[i] = self.collision_counter  # save the collision count
             print(f"Experiment {i} has been completed.")
 

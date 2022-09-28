@@ -42,7 +42,7 @@ if __name__ == "__main__":
     compression = False
     error_factor = False
 
-    directory = "losses2"
+    directory = "exp2"
     if not os.path.exists(directory):
         os.makedirs(directory)
 

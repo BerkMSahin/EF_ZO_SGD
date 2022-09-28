@@ -26,7 +26,7 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
 
-    directory = "losses"
+    directory = "exp1"
     if not os.path.exists(directory):
         os.makedirs(directory)
 

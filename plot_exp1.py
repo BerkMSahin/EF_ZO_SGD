@@ -2,53 +2,49 @@ import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--iterations", default=3, help="Number of iterations for each experiment", type=int)
-parser.add_argument("--dir", default="losses", help="Directory name for loss histories")
+parser.add_argument("--dir", default="exp1", help="Directory name for loss histories")
 
 args = parser.parse_args()
 
-ITERATION = args.iterations
-DIR = args.dir
+directory = args.dir
 
 if __name__ == "__main__":
+    # Plot the compressions without error feedback
+    compressions = [f.name for f in os.scandir(directory + "/no-error") if f.is_dir()]
+    for compression in compressions:
+        _, _, files = next(os.walk(directory + "/no-error/" + compression))
+        iterations = len(files)
+        loss = 0
+        for file in files:
+            loss += np.load(directory + '/no-error/' + compression + '/' + file) / iterations
 
-    compressions = ["top", "rand",
-                    "dropout-biased", "dropout-unbiased",
-                    "qsgd"]
-
-    # Plot No Compression Case
-    no_comp_loss = 0
-    for i in range(ITERATION):
-        loss = np.load(f"./{DIR}/noComp{i}.npy")
-        no_comp_loss += loss / ITERATION
-
-    for i in range(2):
-
-        if i == 0:
-            error = ""
-            pretitle = "Loss vs. Step (without error feedback)"
-        else:
-            error = "e"
-            pretitle = "Loss vs. Step (with error feedback)"
-            compressions.remove("dropout-unbiased")  # because it diverges
-
-        plt.title(pretitle)
+        plt.title("Loss vs. time without error factor")
         plt.xlabel("Steps")
         plt.ylabel("Loss")
-        plt.plot(no_comp_loss)
+        plt.legend(compressions)
+        plt.plot(loss)
 
-        for cname in compressions:
-            # Mean Loss
-            loss_hist = 0
-            for exp_idx in range(ITERATION):
-                # Load the loss for exp_idx th experiment
-                loss = np.load(f"./{DIR}/{cname}{error}{exp_idx}.npy")
-                loss_hist += loss / ITERATION
+    plt.savefig(directory + "/no-error/Figure.png")
+    plt.close()
 
-            plt.plot(loss_hist)
+    # Plot the compressions with error feedback
+    compressions = [f.name for f in os.scandir(directory + "/error") if f.is_dir()]
+    compressions.remove("dropout-unbiased")
+    for compression in compressions:
+        _, _, files = next(os.walk(directory + "/error/" + compression))
+        iterations = len(files)
+        loss = 0
+        for file in files:
+            loss += np.load(directory + '/error/' + compression + '/' + file) / iterations
 
-        plt.legend(["NoComp"] + [cname for cname in compressions])
-        plt.show()
+        plt.title("Loss vs. time with error factor")
+        plt.xlabel("Steps")
+        plt.ylabel("Loss")
+        plt.legend(compressions)
+        plt.plot(loss)
+
+    plt.savefig(directory + "/error/Figure.png")
