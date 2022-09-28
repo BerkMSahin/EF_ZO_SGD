@@ -17,7 +17,7 @@ class Simulation:
                  num_bits=3, quantization_function="top", dropout_p=0.5,
                  fraction_coordinates=0.5, error_factor=False, plot=False,
                  n_dropout=True, n_dropout_p=0.5, cooldown=3,
-                 test_lambda=False, test_agents=False):
+                 test_lambda=False, test_agents=False, plot_collisions=False):
         self.eta = eta
         self.alpha = alpha
         self.beta = beta
@@ -33,6 +33,7 @@ class Simulation:
         self.anim_width = anim_width
         self.anim_height = anim_height
         self.losses_aggregate = []
+        self.collisions = []
         self.global_losses = []
         self.agents = []
         self.agent_locs = np.zeros((n, steps, dim))
@@ -56,10 +57,14 @@ class Simulation:
         self.test_lambda = test_lambda
         self.test_agents = test_agents
         self.path = ""
+        self.plot_collisions = plot_collisions
 
-    @staticmethod
-    def tracking_error(agent, source):
-        return norm(agent.position - source.position) ** 2
+    def loss(self, agent, source):
+        index = agent.index
+        loss = agent.loss(source)
+        for neighbor in self.detected_neighbors[index]:
+            loss -= agent.loss_reg(neighbor)
+        return loss
 
     # Calculates and updates each agent's list of neighboring agents
     def calculate_neighbors(self):
@@ -127,6 +132,7 @@ class Simulation:
                     agent.compute_grad(source)
 
                 self.count_collisions()
+                self.collisions.append(self.collision_counter)
 
                 for k in range(self.n):
                     agent = self.agents[k]
@@ -154,7 +160,7 @@ class Simulation:
                     source.set_velocity(agent)
                     source.move()
 
-                    error = self.tracking_error(agent, source)
+                    error = self.loss(agent, source)
                     self.losses_aggregate[j].append(error)
 
                 self.losses_aggregate[j] = np.array(self.losses_aggregate[j])
@@ -165,7 +171,7 @@ class Simulation:
             self.losses_aggregate = []
             self.global_losses.append(global_loss)
 
-            # Save the losses
+            # Save the losses and collisions
             if self.test_agents or self.test_lambda:
                 if self.compression:
                     e = '-e' if self.error_factor else ''
@@ -180,7 +186,10 @@ class Simulation:
                     path = self.path + '/' + str(self.Lambda)
                     if not os.path.exists(path):
                         os.makedirs(path)
-                    np.save(path + '/' + str(i), global_loss)
+                    if self.plot_collisions:
+                        np.save(path + '/' + str(i), np.array(self.collisions))
+                    else:
+                        np.save(path + '/' + str(i), global_loss)
                 elif self.test_agents:
                     path = self.path + '/' + str(self.n)
                     if not os.path.exists(path):
@@ -214,6 +223,7 @@ class Simulation:
                         os.makedirs(path)
                     np.save(path + '/' + str(i), global_loss)
 
+            self.collisions = []
             self.collision_hist[i] = self.collision_counter  # save the collision count
             print(f"Experiment {i} has been completed.")
 

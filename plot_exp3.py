@@ -15,13 +15,14 @@ directory = args.dir
 if __name__ == "__main__":
     compressions = [f.name for f in os.scandir(directory) if f.is_dir()]
     for compression in compressions:
-        Ns = [f.name for f in os.scandir(directory + '/' + compression) if f.is_dir()]
+        Ns = [int(f.name) for f in os.scandir(directory + '/' + compression) if f.is_dir()]
+        Ns.sort()
         for N in Ns:
-            _, _, files = next(os.walk(directory + '/' + compression + '/' + N))
+            _, _, files = next(os.walk(directory + '/' + compression + '/' + str(N)))
             iterations = len(files)
             loss = 0
             for file in files:
-                loss += np.load(directory + '/' + compression + '/' + N + '/' + file) / iterations
+                loss += np.load(directory + '/' + compression + '/' + str(N) + '/' + file) / iterations
 
             plt.plot(loss)
 

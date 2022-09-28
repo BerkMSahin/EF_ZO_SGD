@@ -6,7 +6,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--dir", default="exp2", help="Directory name for loss histories", type=str)
+parser.add_argument("--dir", default="exp2", help="Directory name for collision histories", type=str)
 
 args = parser.parse_args()
 
@@ -15,20 +15,21 @@ directory = args.dir
 if __name__ == "__main__":
     compressions = [f.name for f in os.scandir(directory) if f.is_dir()]
     for compression in compressions:
-        lambdas = [f.name for f in os.scandir(directory + '/' + compression) if f.is_dir()]
+        lambdas = [float(f.name) for f in os.scandir(directory + '/' + compression) if f.is_dir()]
+        lambdas.sort()
         for lmb in lambdas:
-            _, _, files = next(os.walk(directory + '/' + compression + '/' + lmb))
+            _, _, files = next(os.walk(directory + '/' + compression + '/' + str(lmb)))
             iterations = len(files)
             loss = 0
             for file in files:
-                loss += np.load(directory + '/' + compression + '/' + lmb + '/' + file) / iterations
+                loss += np.load(directory + '/' + compression + '/' + str(lmb) + '/' + file) / iterations
 
             plt.plot(loss)
 
         plt.legend(lambdas, title="lambdas")
-        plt.title("Loss vs. time with " + compression)
+        plt.title("Collisions vs. time with " + compression)
         plt.xlabel("Steps")
-        plt.ylabel("Loss")
+        plt.ylabel("Collisions")
 
         plt.savefig(directory + "/Figure-" + compression + ".png")
         plt.close()
