@@ -7,11 +7,11 @@ import numpy as np
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--iterations", default=3, help="Number of iterations for each experiment", type=int)
-parser.add_argument("--compression", help="Compression name for the no error case", type=str)
-parser.add_argument("--compression_e", help="Compression name for the error case", type=str)
+parser.add_argument("--compression", default="qsgd", help="Compression name for the no error case", type=str)
+parser.add_argument("--compression_e", default="qsgd", help="Compression name for the error case", type=str)
 parser.add_argument("--dir", default="losses3", help="Directory name for loss histories", type=str)
-parser.add_argument("--steps", help="Number of steps in the training", type=int)
-parser.add_argument("--N_list", default="5 20 50 80 100", help="Number of agents you want to test", type=str)
+parser.add_argument("--steps", default=3000, help="Number of steps in the training", type=int)
+parser.add_argument("--N_list", default="10 100 20 5 50", help="Number of agents you want to test", type=str)
 
 
 args = parser.parse_args()

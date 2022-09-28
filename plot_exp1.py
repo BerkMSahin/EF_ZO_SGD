@@ -5,7 +5,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--iterations", help="Number of iterations for each experiment", type=int)
+parser.add_argument("--iterations", default=3, help="Number of iterations for each experiment", type=int)
 parser.add_argument("--dir", default="losses", help="Directory name for loss histories")
 
 args = parser.parse_args()

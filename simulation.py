@@ -158,6 +158,8 @@ class Simulation:
                 self.losses_aggregate[j] = np.array(self.losses_aggregate[j])
 
             global_loss = np.mean(np.array(self.losses_aggregate), axis=1)
+            self.agents = []
+            self.sources = []
             self.losses_aggregate = []
             self.global_losses.append(global_loss)
 
@@ -177,7 +179,6 @@ class Simulation:
                 file_name += f"N{self.n}"
 
             np.save(file_name, global_loss)  # save the loss history
-            self.global_losses = []
             self.collision_hist[i] = self.collision_counter  # save the collision count
             print(f"Experiment {i} has been completed.")
 

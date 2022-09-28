@@ -9,16 +9,16 @@ from simulation import Simulation
 
 parser = argparse.ArgumentParser()
 # Arguments
-parser.add_argument("--eta", help="Learning rate for SGD", type=float)
-parser.add_argument("--steps", help="Number of steps for SGD", type=int)
-parser.add_argument("--iterations", help="Number of experiments for each case", type=int)
-parser.add_argument("--N", help="Number of agents", type=int)
-parser.add_argument("--R", help="Radius of agent's neighbor", type=int)
-parser.add_argument("--Lambda", help="Regularization term", type=float)
-parser.add_argument("--init_size", help="Initialization size", type=int)
-parser.add_argument("--fraction_cord", help="Fraction for top-k compression", type=float)
-parser.add_argument("--dropout_p", help="Dropout probability p", type=float)
-parser.add_argument("--noise", help="Dropout probability for neighbors", type=float)
+parser.add_argument("--eta", default=0.35, help="Learning rate for SGD", type=float)
+parser.add_argument("--steps", default=3000, help="Number of steps for SGD", type=int)
+parser.add_argument("--iterations", default=3, help="Number of experiments for each case", type=int)
+parser.add_argument("--N", default=20, help="Number of agents", type=int)
+parser.add_argument("--R", default=10, help="Radius of agent's neighbor", type=int)
+parser.add_argument("--Lambda", default=10, help="Regularization term", type=float)
+parser.add_argument("--init_size", default=100, help="Initialization size", type=int)
+parser.add_argument("--fraction_cord", default=.5, help="Fraction for top-k compression", type=float)
+parser.add_argument("--dropout_p", default=.5, help="Dropout probability p", type=float)
+parser.add_argument("--noise", default=.5, help="Dropout probability for neighbors", type=float)
 
 args = parser.parse_args()
 
