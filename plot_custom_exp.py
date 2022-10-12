@@ -40,11 +40,11 @@ if __name__ == "__main__":
         else:
             loss_type = "Loss"
 
-        plt.title(f"{loss_type} vs. time without error factor")
+        plt.title(f"{loss_type} vs. Steps ")
         plt.xlabel("Steps")
         plt.ylabel("Loss")
         plt.plot(np.arange(length), mean_loss, color=colors[k], lw=0.5)
-        plt.fill_between(np.arange(length), lower, upper, color=colors[k], alpha=0.1)
+        plt.fill_between(np.arange(length), lower, upper, color=colors[k], alpha=0.2)
 
     plt.legend(legends)
     plt.savefig(directory + "/Figure.png")
