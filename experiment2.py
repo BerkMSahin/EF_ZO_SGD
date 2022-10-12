@@ -53,7 +53,7 @@ if __name__ == "__main__":
         s1 = Simulation(directory=directory, eta=ETA, steps=STEPS,
                         iterations=ITERATIONS, n=N, r=R, Lambda=LAMBDAS[exp_idx],
                         init_size=INIT_SIZE, animate=ANIMATE, compression=False,
-                        test_lambda=True, n_dropout_p=N_DROPOUT_P)
+                        test_lambda=True, n_dropout_p=N_DROPOUT_P, plot_collisions=True)
 
         s2 = Simulation(directory=directory, eta=ETA, steps=STEPS,
                         iterations=ITERATIONS, n=N, r=R, Lambda=LAMBDAS[exp_idx],
@@ -61,7 +61,7 @@ if __name__ == "__main__":
                         quantization_function=cname, error_factor=False,
                         test_lambda=True, n_dropout_p=N_DROPOUT_P,
                         fraction_coordinates=FRACTION_COORDINATES,
-                        dropout_p=DROPOUT_P)
+                        dropout_p=DROPOUT_P, plot_collisions=True)
 
         s3 = Simulation(directory=directory, eta=ETA, steps=STEPS,
                         iterations=ITERATIONS, n=N, r=R, Lambda=LAMBDAS[exp_idx],
@@ -69,7 +69,7 @@ if __name__ == "__main__":
                         quantization_function=cname_e, error_factor=True,
                         test_lambda=True, n_dropout_p=N_DROPOUT_P,
                         fraction_coordinates=FRACTION_COORDINATES,
-                        dropout_p=DROPOUT_P)
+                        dropout_p=DROPOUT_P, plot_collisions=True)
 
         collision_hist = s1.run()
         collision_table["No comp."] = collision_hist
