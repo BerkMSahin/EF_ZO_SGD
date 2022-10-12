@@ -32,10 +32,10 @@ if __name__ == "__main__":
         plt.title("Loss vs. time without error factor")
         plt.xlabel("Steps")
         plt.ylabel("Loss")
-        plt.legend(compressions)
         plt.plot(np.arange(length), mean_loss, color=colors[k], lw=0.5)
         plt.fill_between(np.arange(length), lower, upper, color=colors[k], alpha=0.1)
 
+    plt.legend(compressions)
     plt.savefig(directory + "/no-error/Figure.png")
     plt.close()
 

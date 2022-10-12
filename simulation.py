@@ -17,7 +17,8 @@ class Simulation:
                  num_bits=3, quantization_function="top", dropout_p=0.5,
                  fraction_coordinates=0.5, error_factor=False, plot=False,
                  n_dropout=True, n_dropout_p=0.5, cooldown=3,
-                 test_lambda=False, test_agents=False, plot_collisions=False):
+                 test_lambda=False, test_agents=False, plot_collisions=False,
+                 custom_mode=False):
         self.eta = eta
         self.alpha = alpha
         self.beta = beta
@@ -58,6 +59,7 @@ class Simulation:
         self.test_agents = test_agents
         self.path = ""
         self.plot_collisions = plot_collisions
+        self.custom_mode = custom_mode
 
     def loss(self, agent, source):
         index = agent.index
@@ -171,56 +173,90 @@ class Simulation:
             self.losses_aggregate = []
             self.global_losses.append(global_loss)
 
-            # Save the losses and collisions
-            if self.test_agents or self.test_lambda:
-                if self.compression:
-                    e = '-e' if self.error_factor else ''
-                    self.path = self.directory + '/' + self.quantization_function + e
-                else:
-                    self.path = self.directory + '/' + "no-comp"
-
-                if not os.path.exists(self.path):
-                    os.makedirs(self.path)
-
-                if self.test_lambda:
-                    path = self.path + '/' + str(self.Lambda)
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    if self.plot_collisions:
-                        np.save(path + '/' + str(i), np.array(self.collisions))
+            if not self.custom_mode:
+                # Save the losses and collisions
+                if self.test_agents or self.test_lambda:
+                    if self.compression:
+                        e = '-e' if self.error_factor else ''
+                        self.path = self.directory + '/' + self.quantization_function + e
                     else:
+                        self.path = self.directory + '/' + "no-comp"
+
+                    if not os.path.exists(self.path):
+                        os.makedirs(self.path)
+
+                    if self.test_lambda:
+                        path = self.path + '/' + str(self.Lambda)
+                        if not os.path.exists(path):
+                            os.makedirs(path)
+                        if self.plot_collisions:
+                            np.save(path + '/' + str(i), np.array(self.collisions))
+                        else:
+                            np.save(path + '/' + str(i), global_loss)
+                    elif self.test_agents:
+                        path = self.path + '/' + str(self.n)
+                        if not os.path.exists(path):
+                            os.makedirs(path)
                         np.save(path + '/' + str(i), global_loss)
-                elif self.test_agents:
-                    path = self.path + '/' + str(self.n)
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    np.save(path + '/' + str(i), global_loss)
-            else:
-                path_error = self.directory + '/error'
-                path_no_error = self.directory + '/no-error'
-
-                if not os.path.exists(path_error):
-                    os.makedirs(path_error)
-
-                if not os.path.exists(path_no_error):
-                    os.makedirs(path_no_error)
-
-                if self.compression:
-                    path = path_error + '/' + self.quantization_function if self.error_factor \
-                        else path_no_error + '/' + self.quantization_function
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    path += '/' + str(i)
-                    np.save(path, global_loss)
                 else:
-                    path = path_error + '/no-comp'
-                    if not os.path.exists(path):
-                        os.makedirs(path)
-                    np.save(path + '/' + str(i), global_loss)
+                    path_error = self.directory + '/error'
+                    path_no_error = self.directory + '/no-error'
 
-                    path = path_no_error + '/no-comp'
-                    if not os.path.exists(path):
-                        os.makedirs(path)
+                    if not os.path.exists(path_error):
+                        os.makedirs(path_error)
+
+                    if not os.path.exists(path_no_error):
+                        os.makedirs(path_no_error)
+
+                    if self.compression:
+                        path = path_error + '/' + self.quantization_function if self.error_factor \
+                            else path_no_error + '/' + self.quantization_function
+                        if not os.path.exists(path):
+                            os.makedirs(path)
+                        path += '/' + str(i)
+                        np.save(path, global_loss)
+                    else:
+                        path = path_error + '/no-comp'
+                        if not os.path.exists(path):
+                            os.makedirs(path)
+                        np.save(path + '/' + str(i), global_loss)
+
+                        path = path_no_error + '/no-comp'
+                        if not os.path.exists(path):
+                            os.makedirs(path)
+                        np.save(path + '/' + str(i), global_loss)
+
+            else:
+                path = self.directory + '/'
+                # Check the compression
+                if self.compression:
+                    compressor_name = self.compressor.quantization_function
+                    path += 'C' + compressor_name
+                    if compressor_name == "qsgd":
+                        path += 'Bits' + str(self.compressor.num_bits)
+                    elif compressor_name == "top" or compressor_name == "rand":
+                        path += 'k' + str(self.compressor.fraction_coordinates)
+                    elif compressor_name == "dropout-unbiased" or compressor_name == "dropout-biased":
+                        path += 'p' + str(self.compressor.dropout_p)
+                    else:
+                        print("Invalid compressor.")
+                else:
+                    path += "NoC"
+
+                # Check the error feedback
+                if self.error_factor:
+                    path += "ErrY"
+                else:
+                    path += "ErrN"
+
+                path += 'N' + str(self.n) + 'R'+ str(self.r) + 'Lmb' + str(self.Lambda) + 'NDrop' + str(self.n_dropout_p) + "Eta" + str(self.eta)
+
+                if not os.path.exists(path):
+                    os.makedirs(path)
+
+                if self.plot_collisions:
+                    np.save(path + 'Coll/' + str(i), np.array(self.collisions))
+                else:
                     np.save(path + '/' + str(i), global_loss)
 
             self.collisions = []
