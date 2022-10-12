@@ -108,6 +108,7 @@ class Simulation:
                     neighbor.cooldown = self.cooldown
 
     def run(self):
+        exp_No = len(os.listdir(self.directory))
         for i in range(self.iterations):
             np.random.seed(i + 5)  # set random seed
             self.collision_counter = 0
@@ -227,7 +228,7 @@ class Simulation:
                         np.save(path + '/' + str(i), global_loss)
 
             else:
-                path = self.directory + '/'
+                path = self.directory + '/' + str(exp_No)
                 # Check the compression
                 if self.compression:
                     compressor_name = self.compressor.quantization_function

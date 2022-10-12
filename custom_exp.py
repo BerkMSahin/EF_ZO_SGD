@@ -10,9 +10,9 @@ parser = argparse.ArgumentParser()
 # Arguments
 parser.add_argument("--compression_name", default="qsgd", help="Compression case without error feedback", type=str)
 
-parser.add_argument("--compression", default=False, help="Compression case without error feedback", type=bool)
-parser.add_argument("--error_feedback", default=False, help="Error-feedback for compressed gradients. ", type=bool)
-parser.add_argument("--plot_collisions", default=False, help="Switch for plotting collision vs. time", type=bool)
+parser.add_argument("--compression", default="False", help="Compression case without error feedback", type=str)
+parser.add_argument("--error_feedback", default="False", help="Error-feedback for compressed gradients. ", type=str)
+parser.add_argument("--plot_collisions", default="False", help="Switch for plotting collision vs. time", type=str)
 
 parser.add_argument("--fraction_cord", default=.5, help="Fraction for top-k compression", type=float)
 parser.add_argument("--eta", default=0.35, help="Learning rate for SGD", type=float)
@@ -29,6 +29,14 @@ parser.add_argument("--iterations", default=3, help="Number of experiments for e
 
 args = parser.parse_args()
 
+def bool_converter(value):
+    if value == "False" or value == "false" or value == "FALSE":
+        return False
+    elif value == "True" or value == "TRUE" or value == "true":
+        return True
+    else :
+        print("Invalid Valu")
+        return None
 
 if __name__ == "__main__":
 
@@ -44,15 +52,16 @@ if __name__ == "__main__":
     FRACTION_COORDINATES = args.fraction_cord  # 0.5
     DROPOUT_P = args.dropout_p  # 0.5
     N_DROPOUT_P = args.noise  # 0.5
-    PLOT_COL = args.plot_collisions
+    PLOT_COL = bool_converter(args.plot_collisions)
     NUM_BITS = args.num_bits
-    ERR_FEEDBACK = args.error_feedback
-    COMPRESSION = args.compression
-
+    ERR_FEEDBACK = bool_converter(args.error_feedback)
+    COMPRESSION = bool_converter(args.compression)
 
     directory = "custom_exp"
     if not os.path.exists(directory):
         os.makedirs(directory)
+
+
 
     s1 = Simulation(directory=directory, eta=ETA, steps=STEPS,
                     iterations=ITERATIONS, n=N, r=R, Lambda=LAMBDA,

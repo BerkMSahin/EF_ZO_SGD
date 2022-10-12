@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     tree = os.walk(directory)
     next(tree)
-    for k, (root, _, files) in enumerate(tree):
+    for k, (root, _, files) in enumerate(sorted(tree)):
         iterations = len(files)
         # take the length information
         length = len(np.load(root + '/' + files[0]))
