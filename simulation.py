@@ -252,13 +252,15 @@ class Simulation:
 
                 path += 'N' + str(self.n) + 'R'+ str(self.r) + 'Lmb' + str(self.Lambda) + 'NDrop' + str(self.n_dropout_p) + "Eta" + str(self.eta)
 
+                # Save the collisions and losses
                 if not os.path.exists(path):
                     os.makedirs(path)
 
-                if self.plot_collisions:
-                    np.save(path + 'Coll/' + str(i), np.array(self.collisions))
-                else:
-                    np.save(path + '/' + str(i), global_loss)
+                if not os.path.exists(path+'Coll'):
+                    os.makedirs(path+'Coll')
+
+                np.save(path + 'Coll/' + str(i), np.array(self.collisions))
+                np.save(path + '/' + str(i), global_loss)
 
             self.collisions = []
             self.collision_hist[i] = self.collision_counter  # save the collision count
