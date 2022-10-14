@@ -108,7 +108,7 @@ class Simulation:
                     neighbor.cooldown = self.cooldown
 
     def run(self):
-        exp_No = len(os.listdir(self.directory))
+        exp_No = len(os.listdir(self.directory)) // 2
         for i in range(self.iterations):
             np.random.seed(i + 5)  # set random seed
             self.collision_counter = 0
