@@ -68,18 +68,16 @@ python3 custom_exp.py --compression True --plot_collisions True --compression_na
 ```
 
 To plot the results of that experiment, run the following script.
-```
-For figure 1.a
 
+For figure 1.a:
+```
 python3 plot_custom_exp.py --legends "NoComp QSGD2bEF QSGD1b Top TopEF Dropout-Biased Rand" --title "Nonconvex Objective for Different Compressions" --ylabel "Loss"
-
-For figure 1.b 
-
-python3 plot_custom_exp.py --legends "NoComp QSGD2bEF QSGD1b Top TopEF Dropout-Biased Rand" --title "Nonconvex Objective for Different Compressions" --ylabel "Number of Collisions" --plot_collisions True
-
-Warning: After you are done with the results of this experiment, don't forget to change the name of the custom_exp. If you don't do that, new experiments will write into that folder and different experiments will be mixed. 
-
 ```
+For figure 1.b:
+```
+python3 plot_custom_exp.py --legends "NoComp QSGD2bEF QSGD1b Top TopEF Dropout-Biased Rand" --title "Nonconvex Objective for Different Compressions" --ylabel "Number of Collisions" --plot_collisions True
+```
+Warning: After you are done with the results of this experiment, don't forget to change the name of the custom_exp. If you don't do that, new experiments will write into that folder and different experiments will be mixed. 
 
 ## Experiment 2 
 
@@ -94,25 +92,23 @@ python3 custom_exp.py --compression True --compression_name qsgd --plot_collisio
 ```
 
 To plot the results, run the followin scripts.
-```
-To plot the loss (figure 1.c)
 
+To plot the loss (figure 1.c):
+```
 python3 plot_custom_exp.py --legends "N=5 N=10 N=15 N=20 N=25" --title "QSGD with EF for Different Number of Agents with Proportional Learning Rates" --ylabel "Loss"
-
-You can also plot the collision plot
-
-python3 plot_custom_exp.py --legends "N=5 N=10 N=15 N=20 N=25" --title "QSGD with EF for Different Number of Agents with Proportional Learning Rates" --ylabel "Loss" --plot_collisions True 
-
-Warning: After you are done, don't forget to change the name of "custom_exp" folder. 
 ```
+You can also plot the collision plot:
+```
+python3 plot_custom_exp.py --legends "N=5 N=10 N=15 N=20 N=25" --title "QSGD with EF for Different Number of Agents with Proportional Learning Rates" --ylabel "Loss" --plot_collisions True 
+```
+Warning: After you are done, don't forget to change the name of "custom_exp" folder. 
+
 
 ## Experiment 3 
 
 Run the following scripts respectively to reproduce the results of figure 1.d. 
 
 ```
-To plot the loss 
-
 python3 custom_exp.py --compression True --compression_name qsgd --plot_collisions True --error_feedback True --num_bits 2 --Lambda 0 
 python3 custom_exp.py --compression True --compression_name qsgd --plot_collisions True --error_feedback True --num_bits 2 --Lambda 1
 python3 custom_exp.py --compression True --compression_name qsgd --plot_collisions True --error_feedback True --num_bits 2 --Lambda 2 
@@ -121,17 +117,14 @@ python3 custom_exp.py --compression True --compression_name qsgd --plot_collisio
 python3 custom_exp.py --compression True --compression_name qsgd --plot_collisions True --error_feedback True --num_bits 2 --Lambda 10 
 ```
 
-To plot the figures, run the following script. 
+To plot figure 1.d:
 ```
-To plot figure 1.d 
-
 python3 plot_custom_exp.py --legends "L=0 L=1 L=2 L=5 L=7 L=10" --title "QSGD with EF for Regularizer Test" --ylabel "Number of Collisions" --plot_collisions True 
-
-You can also plot the loss 
-
-python3 plot_custom_exp.py --legends "L=0 L=1 L=2 L=5 L=7 L=10" --title "QSGD with EF for Regularizer Test" --ylabel "Number of Collisions"
-
-Warning: After you are done, don't forget to change the name of "custom_exp" folder. 
 ```
+You can also plot the loss: 
+```
+python3 plot_custom_exp.py --legends "L=0 L=1 L=2 L=5 L=7 L=10" --title "QSGD with EF for Regularizer Test" --ylabel "Number of Collisions"
+```
+Warning: After you are done, don't forget to change the name of "custom_exp" folder. 
 
 To see the animation of any experiment, you can just make --animate argument True. 
