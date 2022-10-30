@@ -11,7 +11,7 @@ In this paper, we study a communication-constrained multi-agent zeroth-order onl
 ![](QSDEFLamb.png)
 ![](QSGDEFN.png)
 
-## Proof
+## Convergence Analysis
 
 Proof of theorem 1 can be found [here](ConvergenceAnalysis.pdf).
 
