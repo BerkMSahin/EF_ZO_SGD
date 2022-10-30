@@ -134,4 +134,4 @@ python3 plot_custom_exp.py --legends "L=0 L=1 L=2 L=5 L=7 L=10" --title "QSGD wi
 Warning: After you are done, don't forget to change the name of "custom_exp" folder. 
 ```
 
-To see the animation of any experiment, you can just make --animate argument True. Enjoy the code! 
+To see the animation of any experiment, you can just make --animate argument True. 
