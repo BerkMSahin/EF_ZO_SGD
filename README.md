@@ -13,7 +13,7 @@ In this paper, we study a communication-constrained multi-agent zeroth-order onl
 
 ## How do I run the code? 
 
-A. Install our repo 
+A. Download our repo.
 
 ```
 git clone https://github.com/Sunses-hub/EF_ZO_SGD.git
