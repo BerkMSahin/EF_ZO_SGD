@@ -10,7 +10,7 @@ import os
 
 
 class Simulation:
-    def __init__(self, directory, eta=.35, alpha=.03, beta=.025, dim=2,
+    def __init__(self, directory, eta=100, beta=.1, dim=2,
                  steps=10000, iterations=10, n=5, r=5,
                  Lambda=.1, init_size=100, k=1, animate=False,
                  anim_width=1600, anim_height=900, compression=False,
@@ -18,9 +18,8 @@ class Simulation:
                  fraction_coordinates=0.5, error_factor=False, plot=False,
                  n_dropout=True, n_dropout_p=0.5, cooldown=3,
                  test_lambda=False, test_agents=False, plot_collisions=False,
-                 custom_mode=False):
+                 custom_mode=False, benchmark=False):
         self.eta = eta
-        self.alpha = alpha
         self.beta = beta
         self.dim = dim
         self.steps = steps
@@ -60,12 +59,13 @@ class Simulation:
         self.path = ""
         self.plot_collisions = plot_collisions
         self.custom_mode = custom_mode
+        self.benchmark = benchmark
 
     def loss(self, agent, source):
-        index = agent.index
+        #index = agent.index
         loss = agent.loss(source)
-        for neighbor in self.detected_neighbors[index]:
-            loss -= agent.loss_reg(neighbor)
+        #for neighbor in self.neighbors_aggregate[index]:
+        #    loss -= agent.loss_reg(neighbor)
         return loss
 
     # Calculates and updates each agent's list of neighboring agents
@@ -100,7 +100,7 @@ class Simulation:
                 agent.position = agent.position.reshape(2, 1)
                 neighbor.position = neighbor.position.reshape(2, 1)
 
-                if np.linalg.norm(agent.position - neighbor.position) <= .5 \
+                if np.linalg.norm(agent.position - neighbor.position) <= 3 \
                         and agent.cooldown == 0 \
                         and neighbor.cooldown == 0:
                     self.collision_counter += 1
@@ -108,17 +108,19 @@ class Simulation:
                     neighbor.cooldown = self.cooldown
 
     def run(self):
-        exp_No = len(os.listdir(self.directory)) // 2
+        exp_no = len(os.listdir(self.directory)) // 2
         for i in range(self.iterations):
             np.random.seed(i + 5)  # set random seed
             self.collision_counter = 0
-            server = Server(self)
             for j in range(self.n):
                 agent = Agent(j, self)
                 self.agents.append(agent)
 
                 source = Source(j, self.beta, self)
                 self.sources.append(source)
+
+            if not self.benchmark:
+                server = Server(self)
 
             for j in range(self.steps):
                 if j % self.k == 0:
@@ -147,9 +149,15 @@ class Simulation:
                             agent.error = local_grad_e - local_grad
                         else:
                             local_grad = self.compressor.quantize(local_grad.T).T
-                    server.local_grads.append(local_grad)
+                    if not self.benchmark:
+                        server.local_grads.append(local_grad)
+                    else:
+                        agent.momentum = 0.9 * agent.momentum + self.eta * local_grad
+                        agent.position = agent.position.reshape((1, 2))
+                        agent.position -= agent.momentum
 
-                server.aggregate()
+                if not self.benchmark:
+                    server.aggregate()
 
                 if self.animate and i + 1 == self.iterations:
                     for k in range(self.n):
@@ -228,7 +236,7 @@ class Simulation:
                         np.save(path + '/' + str(i), global_loss)
 
             else:
-                path = self.directory + '/' + str(exp_No)
+                path = self.directory + '/' + str(exp_no)
                 # Check the compression
                 if self.compression:
                     compressor_name = self.compressor.quantization_function

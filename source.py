@@ -5,8 +5,8 @@ from numpy.linalg import norm
 class Source:
     def __init__(self, index, beta, simulation):
         self.simulation = simulation
-        self.position = np.random.uniform(low=simulation.init_size + 100,
-                                          high=3*simulation.init_size + 100,
+        self.position = np.random.uniform(low=simulation.init_size+100,
+                                          high=3*simulation.init_size+100,
                                           size=(1, simulation.dim))
         self.index = index
         self.beta = beta
