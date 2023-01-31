@@ -12,13 +12,13 @@ class GUI:
 
     # Given a pair of lists of coordinates, creates and animates an agent and a source
     # following the specified trajectories
-    def animate(self, agent_locs, source_locs):
+    def animate(self, agent_locs, source_locs, sources):
         # Screen settings
         drawing_area = turtle.Screen()
         drawing_area.setup(width=self.width, height=self.height)
         drawing_area.bgcolor("black")
         drawing_area.title("Simulation")
-        drawing_area.tracer(50, 10)
+        drawing_area.tracer(50, 5) # 50 10
 
         agent_locs = np.round(agent_locs, 2)
         source_locs = np.round(source_locs, 2)
@@ -32,7 +32,7 @@ class GUI:
             animation1.color("green")
             animation1.setx(agent_locs[j, 0, 0])
             animation1.sety(agent_locs[j, 0, 1])
-            animation1.speed(10)
+            animation1.speed(10) # 10
             self.agents_an.append(animation1)
 
             # Initialize the source animation
@@ -43,7 +43,7 @@ class GUI:
             animation2.color("red")
             animation2.setx(source_locs[j, 0, 0])
             animation2.sety(source_locs[j, 0, 1])
-            animation2.speed(1)
+            animation2.speed(1) #1
             self.sources_an.append(animation2)
 
         for j in range(1, self.simulation.steps):
@@ -55,3 +55,25 @@ class GUI:
                 agent_an.goto(np.round(agent_locs[k, j], 2))
 
         turtle.done()
+"""
+radius = sources[0].radius
+        s1, s2, s3 = source_locs[0, 0, :], source_locs[0, 0, :], source_locs[0, 0, :]
+        # trajectory 1
+        turtle.penup()
+        turtle.goto(s1[0] - radius, s1[1])
+        turtle.pendown()
+        turtle.color("blue")
+        turtle.circle(radius)
+        # trajectory 2
+        turtle.penup()
+        turtle.goto(s2[0] - radius, s2[1])
+        turtle.pendown()
+        turtle.color("cyan")
+        turtle.circle(radius)
+        # trajectory 3
+        turtle.penup()
+        turtle.goto(s3[0] - radius, s3[1])
+        turtle.pendown()
+        turtle.color("yellow")
+        turtle.circle(radius)
+"""

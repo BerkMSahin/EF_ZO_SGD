@@ -50,3 +50,26 @@ class Agent:
             local_grad = grad_i / norm(grad_i)
 
         self.local_grad = local_grad
+
+class CircularAgent(Agent):
+    def __init__(self, index, simulation, source):
+        super(CircularAgent, self).__init__(index, simulation)
+        rotate = source.rotate
+        # initialize agent from 1 rad movement behind
+        rotate[0, 1] *= -1
+        rotate[1, 0] *= -1
+        centered_pos = source.position - source.center
+        self.position = np.matmul(rotate, centered_pos.T).T + source.center
+
+    # velocity was removed
+    def loss_plus(self, source, u):
+        return .5 * (norm(self.position + self.mu * u - source.position) ** 2)
+
+
+
+
+
+
+
+
+

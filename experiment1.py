@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser()
 # Arguments
 parser.add_argument("--eta", default=0.35, help="Learning rate for SGD", type=float)
 parser.add_argument("--steps", default=3000, help="Number of steps for SGD", type=int)
-parser.add_argument("--iterations", default=3, help="Number of experiments for each case", type=int)
+parser.add_argument("--iterations", default=5, help="Number of experiments for each case", type=int)
 parser.add_argument("--N", default=20, help="Number of agents", type=int)
 parser.add_argument("--R", default=10, help="Radius of agent's neighbor", type=int)
 parser.add_argument("--Lambda", default=10, help="Regularization term", type=float)
@@ -31,12 +31,12 @@ if __name__ == "__main__":
         os.makedirs(directory)
 
     # PARAMETERS
+    ANIMATE = False
     ETA = args.eta  # 0.35
     STEPS = args.steps  # 10000
     ITERATIONS = args.iterations  # Number of experiments for each case
     N, R, LAMBDA = args.N, args.R, args.Lambda  # 20 20 5
     INIT_SIZE = args.init_size  # 80
-    ANIMATE = False
     FRACTION_COORDINATES = args.fraction_cord  # 0.5
     DROPOUT_P = args.dropout_p  # 0.5
     N_DROPOUT_P = args.noise  # 0.5
